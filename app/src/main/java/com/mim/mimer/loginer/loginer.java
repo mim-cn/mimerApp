@@ -5,25 +5,37 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mim.mimer.chats.ChatActivity;
 import com.mim.mimer.R;
 
 public class loginer extends Activity {
-
+//    static {
+//        try {
+//            System.loadLibrary("ellog");
+//            System.loadLibrary("mimp");
+//            System.loadLibrary("transmitter");
+//            System.loadLibrary("uv");
+//            System.loadLibrary("uvbase");
+//        } catch (Throwable e) {
+//            Log.d("zzzzz", "加载xx库异常 ：" + e.toString());
+//        }
+//    }
     private EditText id_login;
     private EditText password_login;
     private ImageView avatar_login;
     private CheckBox rememberpassword_login;
     private CheckBox auto_login;
-    private Button button_login;
+    private TextView button_login;
     private SharedPreferences sp;
     private String idvalue;
     private String passwordvalue;
@@ -41,7 +53,7 @@ public class loginer extends Activity {
         avatar_login = (ImageView) findViewById(R.id.login_avatar);
         rememberpassword_login = (CheckBox) findViewById(R.id.login_rememberpassword);
         auto_login = (CheckBox) findViewById(R.id.login_autologin);
-        button_login = (Button) findViewById(R.id.login_button);
+        button_login = (TextView) findViewById(R.id.login_button);
 
         if (sp.getBoolean("ischeck", false)) {
             rememberpassword_login.setChecked(true);

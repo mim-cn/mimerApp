@@ -32,20 +32,20 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Type somthing here"
                 android:maxLines="2" />
 
             <Button
                 android:id="@+id/send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Send" />
+                android:text="SEND"/>
         </LinearLayout>
     </LinearLayout>
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="@dimen/sliding_menu_width"
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_height="match_parent"
         android:layout_gravity="start|bottom"
         android:scrollbarThumbVertical="@android:color/transparent">
@@ -53,9 +53,10 @@
         <LinearLayout
             android:id="@+id/left_drawer"
             android:layout_width="@dimen/sliding_menu_width"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/sliding_menu_width"
             android:background="@android:color/transparent"
             android:divider="@android:color/transparent"
-            android:orientation="vertical"></LinearLayout>
+            android:orientation="vertical">
+        </LinearLayout>
     </ScrollView>
 </android.support.v4.widget.DrawerLayout>

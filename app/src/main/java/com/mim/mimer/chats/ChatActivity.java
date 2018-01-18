@@ -21,6 +21,7 @@ import android.widget.ListView;
 import com.mim.mimer.R;
 import com.mim.mimer.chats.Msg;
 import com.mim.mimer.chats.MsgAdapter;
+import com.mim.mimer.sender.Sender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     private ViewAnimator viewAnimator;
     private LinearLayout linearLayout;
     private static boolean isExit = false;
-
+    private  Sender sender = null;
     private MsgAdapter adapter;
     private List<Msg> msgList = new ArrayList<Msg>();
 
@@ -62,7 +63,6 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         msgListView = (ListView) findViewById(R.id.msg_list_view);
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
-
         // 初始化消息数据
         initMsgs();
         adapter = new MsgAdapter(ChatActivity.this, R.layout.activity_msg, msgList);
@@ -99,7 +99,24 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         setActionBar();
         createMenuList();
         viewAnimator = new ViewAnimator<>(this, list, null, drawerLayout, this);
+        initConnect();
     }
+
+    private void initConnect(){
+        if(sender == null) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sender = new Sender("127.0.0.1", 9130);
+                    sender.connect("192.168.1.109", 9130);
+                }
+            });
+            thread.start();
+        }else{
+
+        }
+    }
+
 
     private void initMsgs() {
         Msg msg1 = new Msg("Hello guy.", Msg.TYPE_RECEIVED);
@@ -108,6 +125,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         msgList.add(msg2);
         Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.TYPE_RECEIVED);
         msgList.add(msg3);
+
     }
 
     @Override
@@ -123,7 +141,6 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     @Override
     public void disableHomeButton() {
         getSupportActionBar().setHomeButtonEnabled(false);
-
     }
 
     @Override
