@@ -9,7 +9,6 @@ public final class Sender {
             System.loadLibrary("transmitter");
             System.loadLibrary("uv");
             System.loadLibrary("uvbase");
-            System.loadLibrary("ellog");
             System.loadLibrary("mimp");
         } catch (Throwable e) {
             Log.d("zzzzz", "加载xx库异常 ：" + e.toString());

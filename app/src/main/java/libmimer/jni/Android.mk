@@ -61,9 +61,3 @@ LOCAL_SHARED_LIBRARIES  += uv
 LOCAL_SHARED_LIBRARIES  += transmitter
 #生成共享库
 include $(BUILD_SHARED_LIBRARY)
-#$(warning "the value of HOST_OS is$(HOST_OS)")
-ifeq ($(HOST_OS),windows)
-$(cmd /k xcopy ..\libs\* ..\..\..\jniLibs  /Y /S)
-else
-$(shell cp -arf $(LOCAL_PATH)/../libs/* $(LOCAL_PATH)/../../../jniLibs)
-endif
