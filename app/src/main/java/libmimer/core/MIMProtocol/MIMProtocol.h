@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <string.h>
-#include "ellog.h"
+#include "log_android.h"
 #include "comdefine.h"
 #include "MIMPacket.h"
 
@@ -131,7 +131,6 @@ private:
     Analyzer    _ctrler;    // save each packet's controller
     bool        _dried;
     Stream*     _stream;
-    mim::ellog* _loger;
 };
 
 }//namespace mimer

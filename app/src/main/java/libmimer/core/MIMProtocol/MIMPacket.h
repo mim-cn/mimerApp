@@ -35,8 +35,10 @@
 #include <list>
 #include "MIMInt.h"
 #include "MIMErr.h"
-#include "ellog.h"
-
+// #include "ellog.h"
+#include "platform.h"
+#include "Stream.h"
+#include "log_android.h"
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -804,7 +806,6 @@ private:
     int      _step;      // measure the encoding / decoding progress
     int      _dried;     // packet's DRIED flag
     bool     _setrl;     // Remaining Length is set
-    mim::ellog* _loger;
 };
 
 }//namespace MIMer

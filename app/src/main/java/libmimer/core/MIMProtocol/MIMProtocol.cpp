@@ -3,19 +3,17 @@ namespace mimer {
 
 MIMProtocol::MIMProtocol(Type mtype):_mqData(NULL),_ptype(-1),_mtype(mtype),_dried(0),_stream(NULL)
 {
-    _loger = new mim::ellog("MIMProtocol", "./logs");
 }
 
 MIMProtocol::MIMProtocol(char* content,int mtype):_mtype((Type)mtype),_dried(0),_stream(NULL)
 {
-    _loger = new mim::ellog("MIMProtocol", "./logs");
     _mqData = new MIMPacket(MIMPacket::type(content[0]));
     if(_mqData->decode(content)){
         _ptype = _mqData->type();
         _dried = tFMT(pHeaders)->header.bits.retain;
-        _loger->debug("MIMPacket type: %v", _mqData->types());
+        LOGD("MIMPacket type: %s", _mqData->types());
     }else{
-        _loger->error("MIMPacket type: %v decode failed", _mqData->types());
+        LOGE("MIMPacket type: %s decode failed", _mqData->types());
         printf("%s", "MIMpacket decode error!!!\n");
     }
     analyzer();
@@ -24,7 +22,6 @@ MIMProtocol::MIMProtocol(char* content,int mtype):_mtype((Type)mtype),_dried(0),
 MIMProtocol::MIMProtocol(int ptype, int mtype, int dried, int dup,int qos):
     _ptype(ptype),_mtype((Type)mtype),_dried(dried),_stream(NULL)
 {
-    _loger = new mim::ellog("MIMProtocol", "./logs");
     _mqData = new MIMPacket(ptype, dried, dup, qos);
 }
 
@@ -38,16 +35,12 @@ MIMProtocol::~MIMProtocol()
         delete _stream;
         _stream = NULL;
     }
-    if (_loger) {
-        delete _loger;
-        _loger = NULL;
-    }
 }
 
 bool MIMProtocol::analyzer()
 {
     if(0 >= _ptype || 15 <= _ptype /*|| false == _mqData->finish()*/){
-        _loger->error("MIMPacket type: %v packet type: %v", _mqData->types(), _ptype);
+        LOGE("MIMPacket type: %s packet type: %d", _mqData->types(), _ptype);
         printf("%s", "Invalid packet type or incomplete packet!!!\n");
         return false;
     }
@@ -130,7 +123,7 @@ bool MIMProtocol::analyzer()
     case PINGRESP:
     case DISCONNECT:
         //_ctrler["header"] = (tFMT(pHeaders)->header);
-        _loger->warn("%v ONLY HEADER!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s ONLY HEADER!!", MIMPacket::packet_names[_ptype]);
         break;
     default:
         printf("error packet type\n");
@@ -141,7 +134,7 @@ bool MIMProtocol::analyzer()
 
 bool MIMProtocol::controller()
 {
-    _loger->debug("MIMProtocol type: %v", _mtype);
+    LOGD("MIMProtocol type: %d", _mtype);
     return true;
 }
 
@@ -175,7 +168,7 @@ callback* MIMProtocol::response(void * data, ssize_t& size)
         repk->addTopics(2);
         break;
     case SUBACK:
-        _loger->warn("%v NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_RESP, data);
         break;
     case CONNECT:
@@ -189,7 +182,7 @@ callback* MIMProtocol::response(void * data, ssize_t& size)
         repk->setClientId();
         break;
     case CONNACK:
-        _loger->warn("%v NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_RESP, data);
         break;
     case PUBACK:
@@ -197,7 +190,7 @@ callback* MIMProtocol::response(void * data, ssize_t& size)
     case PUBREL:
     case PUBCOMP:
     case UNSUBACK:
-        _loger->warn("%v NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_RESP, data);
         break;
     case UNSUBSCRIBE:
@@ -206,10 +199,10 @@ callback* MIMProtocol::response(void * data, ssize_t& size)
     case PINGREQ:
         repk = new MIMPacket(PINGRESP);
         // PINGRESP only header
-        _loger->warn("%v only header!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s only header!!!", MIMPacket::packet_names[_ptype]);
         break;
     case PINGRESP:
-        _loger->warn("%v NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT RESPONSE!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_RESP, data);
         break;
     case DISCONNECT:
@@ -247,7 +240,7 @@ callback* MIMProtocol::request(void* data, ssize_t& size)
         reqpk->addTopics(1, "Test!", 5);
         break;
     case SUBACK:
-        _loger->warn("%v NO SUPPORT REQUEST!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT REQUEST!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_REQ, data);
         break;
     case CONNECT:
@@ -282,7 +275,7 @@ callback* MIMProtocol::request(void* data, ssize_t& size)
         }
         // connect falied
         else {
-            _loger->error("connect error %v", (int)_ctrler["RC"]);
+            LOGE("connect error %d", (int)_ctrler["RC"]);
             return ret_err(_ptype, (int)_ctrler["RC"], data);
         }
         break;
@@ -294,7 +287,7 @@ callback* MIMProtocol::request(void* data, ssize_t& size)
         reqpk->setPacketId(1000);
         break;
     case UNSUBACK:
-        _loger->warn("%v NO SUPPORT REQUEST!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT REQUEST!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_REQ, data);
         break;
     case UNSUBSCRIBE:
@@ -308,7 +301,7 @@ callback* MIMProtocol::request(void* data, ssize_t& size)
         reqpk->setPingStatus(PING_WRITING);
         break;
     case PINGRESP:
-        _loger->warn("%v NO SUPPORT REQUEST!!!", MIMPacket::packet_names[_ptype]);
+        LOGW("%s NO SUPPORT REQUEST!!!", MIMPacket::packet_names[_ptype]);
         return ret_err(_ptype, NO_SUPPORT_REQ, data);
         break;
     case DISCONNECT:
@@ -348,7 +341,7 @@ callback* MIMProtocol::ret(MIMPacket* pkt, void* data, ssize_t& size)
 callback* MIMProtocol::ret_err(int ptype, int errcode, void* data)
 {
     if (0 >= ptype || 15 <= ptype /*|| false == _mqData->finish()*/) {
-        _loger->error("MIMPacket type: %v packet type: %v", _mqData->types(), _ptype);
+        LOGE("MIMPacket type: %s packet type: %d", _mqData->types(), _ptype);
         return NULL;
     }
     data = malloc(sizeof(callback));
@@ -365,10 +358,10 @@ bool MIMProtocol::analyzer(void* data, ssize_t& size)
     if (_mqData->decode(content)) {
         _ptype = _mqData->type();
         _dried = tFMT(pHeaders)->header.bits.retain;
-        _loger->debug("MIMPacket type: %v", _mqData->types());
+        LOGD("MIMPacket type: %s", _mqData->types());
     }
     else {
-        _loger->error("MIMPacket type: %v decode failed", _mqData->types());
+        LOGE("MIMPacket type: %s decode failed", _mqData->types());
         printf("%s", "MIMpacket decode error!!!\n");
         return false;
     }

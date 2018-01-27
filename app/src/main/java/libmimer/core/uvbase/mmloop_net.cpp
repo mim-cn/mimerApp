@@ -11,39 +11,39 @@ namespace mm {
 		}
 
 		int Stream::shutdown() {
-			_loger->debug("Stream is shutdown");
+			LOGD("Stream is shutdown");
 			uv_shutdown_t* req = new uv_shutdown_t;
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
 			return uv_shutdown(req, stream, _cbShutdown);
 		}
 
 		int Stream::wait() {
-			_loger->debug("Stream is wait");
+			LOGD("Stream is wait");
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
 			return uv_listen(stream, SOMAXCONN, _cbConnection);
 		}
 
 		int Stream::accept(Stream* client) {
-			_loger->debug("Stream is accept");
+			LOGD("Stream is accept");
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
 			uv_stream_t* streamclient = (uv_stream_t *)client->context_ptr();
 			return uv_accept(stream, streamclient);
 		}
 
 		int Stream::read_start() {
-			_loger->debug("Stream is read_start");
+			LOGD("Stream is read_start");
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
 			return uv_read_start(stream, _cbAlloc, _cbRead);
 		}
 
 		int Stream::read_stop() {
-			_loger->debug("Stream is read_stop");
+			LOGD("Stream is read_stop");
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
 			return uv_read_stop(stream);
 		}
 
 		int Stream::write(const char *buf, size_t length) {
-			_loger->debug("Stream is write size:%v context:%v", length, buf);
+			LOGD("Stream is write size:%d context:%s", length, buf);
 			uv_buf_t wbuf = uv_buf_init((char *)buf, length);
 			uv_write_t*	req = new uv_write_t;
 			uv_stream_t * stream = (uv_stream_t *)context_ptr();
@@ -52,7 +52,7 @@ namespace mm {
 
 
 		int Stream::write(const char *buf, size_t length, Stream *send_handle) {
-			_loger->debug("Stream %v is write size:%v context:%v", send_handle,length, buf);
+			LOGD("Stream %p is write size:%d context:%s", send_handle,length, buf);
 			uv_buf_t wbuf = uv_buf_init((char *)buf, length);
 			uv_write_t *req = new uv_write_t;
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
@@ -60,7 +60,7 @@ namespace mm {
 		}
 
 		int Stream::try_write(const char *buf, size_t length) {
-			_loger->debug("Stream is try_write size:%v context:%v", length, buf);
+			LOGD("Stream is try_write size:%d context:%s", length, buf);
 			uv_buf_t wbuf = uv_buf_init((char *)buf, length);
 
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
@@ -69,7 +69,7 @@ namespace mm {
 
 
 		int Stream::set_blocking(int blocking) {
-			_loger->debug("Stream is set_blocking: %v ", blocking);
+			LOGD("Stream is set_blocking: %d", blocking);
 			uv_stream_t* stream = (uv_stream_t *)context_ptr();
 			return uv_stream_set_blocking(stream, blocking);
 		}

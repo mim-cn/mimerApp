@@ -8,7 +8,7 @@
 #include "mmloop_net.h"
 #include "MIMProtocol.h"
 #include "comdefine.h"
-
+#include "log_android.h"
 using namespace mm::uvbase;
 using namespace mimer;
 typedef  TCP  baseT;                       /*Provide a transport layer base class,Now(2017-3-14) is uv::base::TCP*/
@@ -36,13 +36,13 @@ namespace mm {
             typedef void* (unpack)(void*, ssize_t&);
         public:
             /*
-            - ´«ÊäÆ÷½Ó¿Ú
-            0. ÁªÏµ Relate   : ÉÏ²ã»ñÈ¡Ò»¸ö´«ÊäÆ÷
-            1. ´ò°ü Packet   : ½«ÉÏ²ãµÄÔ­Êý¾Ý´ò°ü£¬Îª·¢ËÍ×¼±¸(private)
-            2. ·¢ËÍ Sendto   : ·¢ËÍ°ü×°ºÃµÄÊý¾Ý°ü
-            3. ½ÓÊÕ Recfrm   : ·¢ËÍ°ü×°ºÃµÄÊý¾Ý°ü
-            4. ²ð°ü Unpack   : ½«ÉÏ²ãµÄÔ­Êý¾Ý´ò°ü£¬Îª·¢ËÍ×¼±¸(private)
-            5. È¡¹Ø Unlink   : ±¾´Î½áÊø£¬È¡ÏûÓë´«ÊäÆ÷µÄÁªÏµ
+            - ä¼ è¾“å™¨æŽ¥å£
+            0. è”ç³» Relate   : ä¸Šå±‚èŽ·å–ä¸€ä¸ªä¼ è¾“å™¨
+            1. æ‰“åŒ… Packet   : å°†ä¸Šå±‚çš„åŽŸæ•°æ®æ‰“åŒ…ï¼Œä¸ºå‘é€å‡†å¤‡(private)
+            2. å‘é€ Sendto   : å‘é€åŒ…è£…å¥½çš„æ•°æ®åŒ…
+            3. æŽ¥æ”¶ Recfrm   : å‘é€åŒ…è£…å¥½çš„æ•°æ®åŒ…
+            4. æ‹†åŒ… Unpack   : å°†ä¸Šå±‚çš„åŽŸæ•°æ®æ‰“åŒ…ï¼Œä¸ºå‘é€å‡†å¤‡(private)
+            5. å–å…³ Unlink   : æœ¬æ¬¡ç»“æŸï¼Œå–æ¶ˆä¸Žä¼ è¾“å™¨çš„è”ç³»
             */
             virtual int   Relate(const char* addr, const int port, Type type = SERVER) = 0;
             virtual bool  Create(const char* protocol = "MIM1") = 0;
@@ -151,7 +151,7 @@ namespace mm {
                         _tmer->Sendto(cbd->data, cbd->size);
                     }
                     else {
-                        _tmer->_loger->error("tTM %v OnTimer failed code: %v!!!", user(_tmer->userType), cbd->errcode);
+                        // _tmer->_loger->error("tTM %v OnTimer failed code: %v!!!", user(_tmer->userType), cbd->errcode);
                     }
                 }
             }
@@ -197,7 +197,7 @@ namespace mm {
                         _tmer->Sendto(cbd->data, size);
                     }
                     else {
-                        _tmer->_loger->error("tTM %v request failed code: %v!!!", user(_tmer->userType), cbd->errcode);
+                        // _tmer->_loger->error("tTM %v request failed code: %v!!!", user(_tmer->userType), cbd->errcode);
                     }
                 }
             }

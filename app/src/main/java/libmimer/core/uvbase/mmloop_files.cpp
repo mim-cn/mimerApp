@@ -18,19 +18,19 @@ namespace mm {
 		int FileEvent::start(const char *path, uint flags)
 		{
 			uv_fs_event_t* event = (uv_fs_event_t *)context_ptr();
-			_loger->debug("FileEvent::start file %v", path);
+			LOGD("FileEvent::start file %s", path);
 			return uv_fs_event_start(event, _cbFSevent, path, flags);
 		}
 
 		int FileEvent::stop() {
 			uv_fs_event_t* event = (uv_fs_event_t *)context_ptr();
-			_loger->debug("FileEvent::stop event %v", event);
+			LOGD("FileEvent::stop event %d", event);
 			return uv_fs_event_stop(event);
 		}
 
 		int FileEvent::getpath(char *buffer, size_t *size) {
 			uv_fs_event_t* event = (uv_fs_event_t *)context_ptr();
-			_loger->debug("FileEvent::getpath buffer: %v size: %v", buffer, size);
+			LOGD("FileEvent::getpath buffer: %s size: %d", buffer, size);
 			return uv_fs_event_getpath(event, buffer, size);
 		}
 

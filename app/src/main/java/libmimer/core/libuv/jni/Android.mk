@@ -8,7 +8,6 @@ LOCAL_MODULE    := uv
 #LOCAL_ARM_MODE := arm
 #需要引用的库
 LOCAL_LDFLAGS  := -fPIC -shared  -Wl -ldl
-#LOCAL_LDFLAGS  += -L ../../lib/ellog/$(TARGET_ARCH_ABI)/libellog.so
 $(warning "LOCAL_LDFLAGS" $(LOCAL_LDFLAGS))
 LOCAL_LDLIBS += -latomic
 LOCAL_CPPFLAGS += -fexceptions -frtti
