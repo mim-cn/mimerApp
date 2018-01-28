@@ -1,50 +1,59 @@
-#include "core/transmitter/transmitter.h"
+#include "transmitter.h"
 #include "com_mim_mimer_sender_Sender.h"
-#include "core/log_android.h"
+#include "log_android.h"
+#include "ndkUtils.h"
+
 using namespace mimer;
-using namespace mm::Transmitter;
+mm::Transmitter::tTM* client = NULL;
 
-char *Jstring2CStr(JNIEnv *env, jstring jstr) {
-    LOGD("============================Jstring2CStr IP:%s\n", jstr);
-    char *rtn = NULL;
-    jclass clsstring = env->FindClass("java/lang/String");
-    jstring strencode = env->NewStringUTF("GB2312");
-    jmethodID mid = env->GetMethodID(clsstring, "getBytes", "(Ljava/lang/String;)[B");
-    jbyteArray barr = (jbyteArray) env->CallObjectMethod(jstr, mid, strencode);
-    jsize alen = env->GetArrayLength(barr);
-    jbyte *ba = env->GetByteArrayElements(barr, JNI_FALSE);
-    if (alen > 0) {
-        rtn = (char *) malloc(alen + 1); //new char[alen+1];
-        memcpy(rtn, ba, alen);
-        rtn[alen] = 0;
-    }
-    env->ReleaseByteArrayElements(barr, ba, 0);
-
-    return rtn;
-}
 /*
  * Class:     com_mim_mimer_sender_Sender
  * Method:    connect
  * Signature: (Ljava/lang/String;I)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_mim_mimer_sender_Sender_connect(JNIEnv *env, jobject obj, jstring ip, jint port) {
-    LOGD("============================connect IP:%s  PORT:%d\n", ip, port);
-    tTM client;
+JNIEXPORT jboolean JNICALL Java_com_mim_mimer_sender_Sender_Relate(JNIEnv *env, jobject obj, jstring ip, jint port) {
+    client = new mm::Transmitter::tTM();
     const char *ipc = Jstring2CStr(env, ip);
-    LOGD("============================connect IPC:%s  PORT:%d\n", ipc, port);
-    int rt = client.Relate(ipc, port, CLIENT);
-    LOGD("============================connect Relate:%d \n", rt);
+    int rt = client->Relate(ipc, port, CLIENT);
     return true;
 }
 
+/*
+ * Class:     com_mim_mimer_sender_Sender
+ * Method:    Login
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_mim_mimer_sender_Sender_Login(JNIEnv * env, jobject obj, jstring token, jstring passwd, jint passwdLen)
+{
+
+}
+
+/*
+ * Class:     com_mim_mimer_sender_Sender
+ * Method:    Write
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_mim_mimer_sender_Sender_Write(JNIEnv * env, jobject obj, jint nread, jstring buf)
+{
+
+}
+
+/*
+ * Class:     com_mim_mimer_sender_Sender
+ * Method:    Read
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_mim_mimer_sender_Sender_Read(JNIEnv * env, jobject obj, jint nread, jstring buf)
+{
+
+}
 /*
  * Class:     com_mim_mimer_sender_Sender
  * Method:    cfinalize
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_com_mim_mimer_sender_Sender_cfinalize
-(JNIEnv * env , jobject obj )
+Java_com_mim_mimer_sender_Sender_cfinalize(JNIEnv * env , jobject obj )
 {
 
 }

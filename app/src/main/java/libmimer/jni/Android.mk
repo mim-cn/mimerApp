@@ -45,7 +45,8 @@ LOCAL_CPPFLAGS += -fexceptions -frtti
 LOCAL_CFLAGS := -Wall -O3 -enable-threads
 #定义宏
 TOP_INCLUDE := $(LOCAL_PATH)/../
-LOCAL_C_INCLUDES := $(TOP_INCLUDE)/core/  \
+LOCAL_C_INCLUDES :=  $(TOP_INCLUDE)       \
+    $(TOP_INCLUDE)/core/                  \
 	$(TOP_INCLUDE)/core/transmitter       \
 	$(TOP_INCLUDE)/core/uvbase            \
 	$(TOP_INCLUDE)/core/libuv/include     \
@@ -53,7 +54,8 @@ LOCAL_C_INCLUDES := $(TOP_INCLUDE)/core/  \
 $(warning "include"  $(LOCAL_C_INCLUDES))
 TOP_SRC := $(LOCAL_PATH)/../
 #库对应的源文件
-LOCAL_SRC_FILES := $(TOP_SRC)/client.cpp
+LOCAL_SRC_FILES := $(TOP_SRC)/client.cpp \
+    $(TOP_SRC)/ndkUtils.cpp
 #链接的第三方库
 LOCAL_SHARED_LIBRARIES  += uvbase
 LOCAL_SHARED_LIBRARIES  += mimp

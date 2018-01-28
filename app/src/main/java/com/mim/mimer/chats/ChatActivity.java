@@ -107,8 +107,8 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
             Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    sender = new Sender("127.0.0.1", 9130);
-                    sender.connect("192.168.1.109", 9130);
+                    sender = new Sender("123.207.108.63", 9130);
+                    sender.Relate("123.207.108.63", 9130);
                 }
             });
             thread.start();

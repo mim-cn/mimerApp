@@ -9,11 +9,35 @@ extern "C" {
 #endif
 /*
  * Class:     com_mim_mimer_sender_Sender
- * Method:    connect
+ * Method:    Relate
  * Signature: (Ljava/lang/String;I)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_mim_mimer_sender_Sender_connect
+JNIEXPORT jboolean JNICALL Java_com_mim_mimer_sender_Sender_Relate
   (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_mim_mimer_sender_Sender
+ * Method:    Login
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_mim_mimer_sender_Sender_Login
+  (JNIEnv *, jobject, jstring, jstring, jint);
+
+/*
+ * Class:     com_mim_mimer_sender_Sender
+ * Method:    Write
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_mim_mimer_sender_Sender_Write
+  (JNIEnv *, jobject, jint, jstring);
+
+/*
+ * Class:     com_mim_mimer_sender_Sender
+ * Method:    Read
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_com_mim_mimer_sender_Sender_Read
+  (JNIEnv *, jobject, jint, jstring);
 
 /*
  * Class:     com_mim_mimer_sender_Sender
