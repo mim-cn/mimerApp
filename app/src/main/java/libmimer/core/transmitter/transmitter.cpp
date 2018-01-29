@@ -175,6 +175,7 @@ namespace mm {
 
         //client or client need implement, when it needs to send data, it id called
         void tTM::OnWrote(mmerrno status) {
+            LOGD("tTM is OnWrote...");
             if (this->userType & 1) { //Type::CLIENT ||  Type::BOTH_CLI
                 LOGD("tTM is OnWrote client");
                 _stder->read(1024, -1);

@@ -171,23 +171,24 @@ namespace mm {
             }
             virtual void OnWrite(int result)
             {
-                printf("OnWrite result = %d\n", result);
+                LOGD("OnWrite result = %d\n", result);
             }
             virtual void OnOpen(int result)
             {
-                printf("open end! result = %d\n", result);
+                LOGD("open end! result = %d\n", result);
                 char* buf = "1234";
                 this->write(buf, 4, -1);
             }
 
             virtual void OnClose(int result)
             {
-                printf("OnClose!\n");
+                LOGD("OnClose!\n");
                 this->clean();
             }
 
             virtual void OnRead(char* data, int len)
             {
+                LOGD("tTM %s Stdio OnRead %d!!!", user(_tmer->userType), cbd->errcode);
                 if (_tmer && len > 0) {
                     ssize_t size = len;
                     void* postdata = (void*)data;
@@ -197,7 +198,7 @@ namespace mm {
                         _tmer->Sendto(cbd->data, size);
                     }
                     else {
-                        // _tmer->_loger->error("tTM %v request failed code: %v!!!", user(_tmer->userType), cbd->errcode);
+                        LOGD("tTM %s Stdio OnRead: %d!!!", user(_tmer->userType), cbd->errcode);
                     }
                 }
             }
