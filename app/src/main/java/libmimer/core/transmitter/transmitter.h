@@ -188,7 +188,7 @@ namespace mm {
 
             virtual void OnRead(char* data, int len)
             {
-                LOGD("tTM %s Stdio OnRead %d!!!", user(_tmer->userType), cbd->errcode);
+                LOGD("tTM %s Stdio OnRead %d!!!", user(_tmer->userType), len);
                 if (_tmer && len > 0) {
                     ssize_t size = len;
                     void* postdata = (void*)data;
