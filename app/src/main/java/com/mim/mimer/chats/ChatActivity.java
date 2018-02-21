@@ -13,16 +13,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mim.mimer.R;
 import com.mim.mimer.chats.Msg;
 import com.mim.mimer.chats.MsgAdapter;
 import com.mim.mimer.sender.Sender;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +57,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     private ViewAnimator viewAnimator;
     private LinearLayout linearLayout;
     private static boolean isExit = false;
-    private  Sender sender = null;
+    private static Sender sender = null;
     private MsgAdapter adapter;
     private List<Msg> msgList = new ArrayList<Msg>();
 
@@ -63,15 +68,15 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         msgListView = (ListView) findViewById(R.id.msg_list_view);
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
+        sender = getIntent().getParcelableExtra("SENDER");
         // 初始化消息数据
         initMsgs();
         adapter = new MsgAdapter(ChatActivity.this, R.layout.activity_msg, msgList);
         msgListView.setAdapter(adapter);
-
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //sender.Write(0,null);
                 String content = inputText.getText().toString();
                 if (!"".equals(content)) {
                     Msg msg = new Msg(content, Msg.TYPE_SENT);
@@ -99,24 +104,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         setActionBar();
         createMenuList();
         viewAnimator = new ViewAnimator<>(this, list, null, drawerLayout, this);
-        initConnect();
     }
-
-    private void initConnect(){
-        if(sender == null) {
-            Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    sender = new Sender("123.207.108.63", 9130);
-                    sender.Relate("123.207.108.63", 9130);
-                }
-            });
-            thread.start();
-        }else{
-
-        }
-    }
-
 
     private void initMsgs() {
         Msg msg1 = new Msg("Hello guy.", Msg.TYPE_RECEIVED);
@@ -222,6 +210,16 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
+    @Override
+    public synchronized void onBackPressed() {
+        if (!isExit) {
+            isExit = true;
+            Toast.makeText(getApplicationContext(), "测试中，后退键返回上一页！", Toast.LENGTH_SHORT).show();
+        } else {
+            isExit = false;
+            this.finish();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

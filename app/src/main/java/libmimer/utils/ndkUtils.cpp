@@ -15,7 +15,7 @@ char *Jstring2CStr(JNIEnv *env, jstring jstr)
         rtn[alen] = 0;
     }
     env->ReleaseByteArrayElements(barr, ba, 0);
-    LOGD("Jstring2CStr jstr:%s char* %s\n", jstr, rtn);
+    // LOGD("Jstring2CStr jstr:%s char* %s\n", jstr, rtn);
     return rtn;
 }
 
@@ -27,6 +27,6 @@ jstring CStr2Jstring(JNIEnv *env, const char *pat)
     jbyteArray bytes = env->NewByteArray((jsize) strlen(pat));
     env->SetByteArrayRegion(bytes, 0, (jsize) strlen(pat), (jbyte *) pat); //将char* 转换为byte数组
     jstring encoding = env->NewStringUTF("GB2312");
-    LOGD("CStr2Jstring char* %s\n", pat);
+    // LOGD("CStr2Jstring char* %s\n", pat);
     return (jstring) env->NewObject(strClass, mID, bytes, encoding);
 }

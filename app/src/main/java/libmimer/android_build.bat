@@ -15,7 +15,6 @@ set REBUILD=%2
 if /i "%1"=="1" goto :mimp
 if /i "%1"=="2" goto :uv
 if /i "%1"=="3" goto :uvbase
-if /i "%1"=="4" goto :transmitter
 if /i "%1"=="0" goto :all
 
 :: 编译mimp
@@ -36,18 +35,11 @@ cd %ROOTPATH%\\uvbase\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH%
 echo "build uvbase Success"
 goto :eof
 
-:: 编译transmitter
-:transmitter
-cd %ROOTPATH%\\transmitter\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH%
-echo "build transmitter Success"
-goto :eof
-
 :: 编译所有
 :all
 cd %ROOTPATH%\\libuv\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH% &&       ^
 cd %ROOTPATH%\\MIMProtocol\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH% && ^
 cd %ROOTPATH%\\uvbase\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH% &&      ^
-cd %ROOTPATH%\\transmitter\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH% && ^
 cd %TOPPATH%\\jni && %NDK_BUILD% %REBUILD% && cd %TOPPATH% &&               ^
 echo "build all Success"
 goto :eof
@@ -71,7 +63,6 @@ if  %r% == n  goto :eof
 rd /s /Q %ROOTPATH%\\libuv\\libs       %ROOTPATH%\\libuv\\obj
 rd /s /Q %ROOTPATH%\\MIMProtocol\\libs %ROOTPATH%\\MIMProtocol\\obj
 rd /s /Q %ROOTPATH%\\uvbase\\libs      %ROOTPATH%\\uvbase\\obj
-rd /s /Q %ROOTPATH%\\transmitter\\libs %ROOTPATH%\\transmitter\\obj
 rd /s /Q %TOPPATH%\\libs               %TOPPATH%\\obj
 echo "clean all..."
 goto :eof

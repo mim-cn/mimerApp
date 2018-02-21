@@ -1,21 +1,21 @@
 #include <jni.h>
 #include "log_android.h"
-#include "transmitter.h"
+#include "MimCore.h"
 #include "ndkUtils.h"
 
-using namespace mimer;
-mm::Transmitter::tTM* client = NULL;
-
+static mm::MimCore::tTM*   client = NULL;
+static mm::MimCore::Stdio* ioer = NULL;
+static JavaVM* g_JavaVM = NULL;
 /*
  * Class:     com_mim_mimer_sender_Sender
  * Method:    connect
  * Signature: (Ljava/lang/String;I)Z
  */
 JNIEXPORT jboolean JNICALL Relater(JNIEnv *env, jobject obj, jstring ip, jint port) {
-    client = new mm::Transmitter::tTM();
+    client = new mm::MimCore::tTM(g_JavaVM, env, obj);
     const char *ipc = Jstring2CStr(env, ip);
-    LOGD("Relater IP:%s PORT: %d\n", ipc, port);
     client->Relate(ipc, port, CLIENT);
+    LOGD("Relater IP:%s PORT: %d ioer: %p\n", ipc, port, ioer);
     return true;
 }
 
@@ -36,7 +36,14 @@ JNIEXPORT jboolean JNICALL Loginer(JNIEnv * env, jobject obj, jstring token, jst
  */
 JNIEXPORT void JNICALL Writer(JNIEnv * env, jobject obj, jint nread, jstring buf)
 {
+    LOGD("===Writer===\n");
 
+    if (ioer){
+        ioer->read(1024, -1);
+    }else{
+        ioer = client->getStdio();
+        LOGD("ioer is NULL\n");
+    }
 }
 
 /*
@@ -96,6 +103,7 @@ int register_ndk_load(JNIEnv *env)
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     LOGD("==== JNI_OnLoad ===\n");
+    g_JavaVM = vm;
     JNIEnv* env = NULL;
     jint result = -1;
     jint rt = -1;

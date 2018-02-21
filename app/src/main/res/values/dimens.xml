@@ -6,4 +6,5 @@
     <dimen name="sliding_menu_width">60dp</dimen>
 
     <dimen name="avatar_size">80dp</dimen>
+    <dimen name="avatar_shape_size">100dp</dimen>
 </resources>

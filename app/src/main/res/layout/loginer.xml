@@ -17,17 +17,19 @@
         android:layout_height="@dimen/avatar_size"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="48dp"
-        android:src="@drawable/mimer" />
-
+        android:src="@drawable/mimer"
+        android:background="@drawable/avatar_shape" />
     <EditText
         android:id="@+id/login_id"
         android:layout_width="320dp"
         android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="48dp"
-        android:background="#f5f0f0"
+        android:background="@color/usernam_passwd"
         android:hint="@string/textlogin_id"
-        android:paddingLeft="8dp" />
+        android:textColorHint="@color/login_input_hint"
+        android:paddingLeft="8dp"
+        />
 
     <EditText
         android:id="@+id/login_password"
@@ -35,8 +37,9 @@
         android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:background="#f5f0f0"
+        android:background="@color/usernam_passwd"
         android:hint="@string/textlogin_password"
+        android:textColorHint="@color/login_input_hint"
         android:paddingLeft="8dp" />
 
     <RelativeLayout
@@ -49,12 +52,14 @@
             android:id="@+id/login_rememberpassword"
             android:layout_width="200dp"
             android:layout_height="32dp"
+            android:textColor="@color/text_color"
             android:text="@string/rememberpassword" />
 
         <CheckBox
             android:id="@+id/login_autologin"
             android:layout_width="100dp"
             android:layout_height="32dp"
+            android:textColor="@color/text_color"
             android:layout_alignParentRight="true"
             android:text="@string/autologin" />
     </RelativeLayout>
@@ -67,6 +72,16 @@
         android:background="@drawable/button_shape"
         android:text="@string/text_loginbutton"
         android:gravity="center"
-        android:textColor="#000000"
+        android:textColor="@color/text_color"
         android:textSize="20dp" />
+
+    <TextView android:id="@+id/goto_signup"
+        android:layout_marginTop="20dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="没有账户？ 创建一个..."
+        android:textColor="@color/text_color"
+        android:gravity="center"
+        android:textSize="16dip"/>
 </LinearLayout>

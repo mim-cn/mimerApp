@@ -13,7 +13,6 @@ if [[ $# < 1 ]]; then
 	echo "1.  mimp"
 	echo "2.  uv"
 	echo "3.  uvbase"
-	echo "5.  transmitter"
 	echo "0.  all"
 	exit
 fi
@@ -36,10 +35,6 @@ case $1 in
 		cd $ROOTPATH/uvbase/jni && $NDK_BUILD $REBUILD
 		echo "build uvbase Success"
 		;;
-	4 | transmitter)
-		cd $ROOTPATH/transmitter/jni && $NDK_BUILD $REBUILD
-		echo "build transmitter Success"
-		;;
 	0 | all)
 		cd $ROOTPATH/libuv/jni && $NDK_BUILD $REBUILD
 		cd $ROOTPATH/MIMProtocol/jni && $NDK_BUILD $REBUILD
@@ -53,7 +48,6 @@ case $1 in
 		echo "1.  mimp"
 		echo "2.  uv"
 		echo "3.  uvbase"
-		echo "4.  transmitter"
 		echo "0.  all"
 		exit
 		;;

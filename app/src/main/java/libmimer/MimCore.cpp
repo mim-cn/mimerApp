@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
-#include "transmitter.h"
-#include "log_android.h"
+#include "MimCore.h"
 using namespace mimer;
-
 namespace mm {
-    namespace Transmitter {
+    namespace MimCore {
         //tcp
         int  tTM::Relate(const char* addr, const int port,Type type)
         {
@@ -13,7 +11,7 @@ namespace mm {
             this->userType = type;
             this->init(loop);
             this->_stder = new Stdio(this, loop);
-            LOGD("tTM is Relate addr: %s port: %d type: %s", addr, port, user(userType));
+            LOGD("tTM is Relate addr: %s port: %d type: %s _stder: %p", addr, port, user(userType), _stder);
             switch (type)
             {
             case SERVER:
@@ -67,6 +65,7 @@ namespace mm {
             assert(this->userType & 1);
             if (status != mmerrno::mmSuccess) {
                 LOGE("tTM is OnConnected error: %d", status);
+                _ndkCb->CallNativeMethod("error", "()V");
                 return;
             }
             if (Create("MIM1")) {
@@ -82,9 +81,11 @@ namespace mm {
                 login->willMsg = "test";
                 condata = (void*)login;
                 callback* cbd = _monitor->request(condata, size);
+                this->login();
                 if (cbd->data) {
                     Sendto(cbd->data, cbd->size);
-                    _pinger = new clock(this, 1000, 10000);
+                    _ndkCb->CallNativeMethod("success", "()I");
+                    //_pinger = new clock(this, 1000, 10000);
                 }
                 else {
                     LOGE("User %s login in falied!!!", user(userType));
@@ -178,7 +179,8 @@ namespace mm {
             LOGD("tTM is OnWrote...");
             if (this->userType & 1) { //Type::CLIENT ||  Type::BOTH_CLI
                 LOGD("tTM is OnWrote client");
-                _stder->read(1024, -1);
+                this->writer();
+                //_stder->read(1024, -1);
                 /*
                 char sendbuf[1024];
                 memset(sendbuf, 0, 1024);

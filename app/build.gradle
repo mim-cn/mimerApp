@@ -6,7 +6,7 @@ repositories {
 }
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 23
@@ -15,6 +15,11 @@ android {
         ndk {
             moduleName = "mimer"
             abiFilters "armeabi", "armeabi-v7a"
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
         }
     }
     sourceSets.main {
