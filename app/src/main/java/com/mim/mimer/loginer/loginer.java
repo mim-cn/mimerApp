@@ -59,7 +59,7 @@ public class loginer extends Activity {
             if (sp.getBoolean("auto_ischeck", false)) {
                 auto_login.setChecked(true);
                 isExit = true;
-                if (checkNetStatus(getApplicationContext())) {
+                if (checkNetStatus()) {
                     initConnect();
                     //sender.Login(idvalue, passwordvalue, passwordvalue.length());
                 }
@@ -78,7 +78,7 @@ public class loginer extends Activity {
                 if(idvalue.length() <= 0 || passwordvalue.length() <= 0){
                        mHandler.sendEmptyMessage(Constant.INPUT_USERPWD_ERROR);
                 }else {
-                    if (checkNetStatus(getApplicationContext())) {
+                    if (checkNetStatus()) {
                         initConnect();
                         //sender.Login(idvalue, passwordvalue, passwordvalue.length());
                     }
@@ -138,15 +138,15 @@ public class loginer extends Activity {
                 }
             }
         };
-        checkNetStatus(getApplicationContext());
+        checkNetStatus();
     }
 
-    boolean checkNetStatus(Context context) {
+    boolean checkNetStatus() {
         System.out.println("网络状态发生变化");
         //检测API是不是小于23，因为到了API23之后getNetworkInfo(int networkType)方法被弃用
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
             //获得ConnectivityManager对象
-            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
             //获取ConnectivityManager对象对应的NetworkInfo对象
             //获取WIFI连接的信息
@@ -154,29 +154,29 @@ public class loginer extends Activity {
             //获取移动数据连接的信息
             NetworkInfo dataNetworkInfo = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
             if (wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                Toast.makeText(context, "WIFI已连接,移动数据已连接", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "WIFI已连接,移动数据已连接", Toast.LENGTH_SHORT).show();
                 return true;
             } else if (wifiNetworkInfo.isConnected() && !dataNetworkInfo.isConnected()) {
-                Toast.makeText(context, "WIFI已连接,移动数据已断开", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "WIFI已连接,移动数据已断开", Toast.LENGTH_SHORT).show();
                 return false;
             } else if (!wifiNetworkInfo.isConnected() && dataNetworkInfo.isConnected()) {
-                Toast.makeText(context, "WIFI已断开,移动数据已连接", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "WIFI已断开,移动数据已连接", Toast.LENGTH_SHORT).show();
                 return true;
             } else {
-                Toast.makeText(context, "WIFI已断开,移动数据已断开", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "WIFI已断开,移动数据已断开", Toast.LENGTH_SHORT).show();
                 return false;
             }
             //API大于23时使用下面的方式进行网络监听
         } else {
             System.out.println("API level 大于23");
             //获得ConnectivityManager对象
-            ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
             //获取所有网络连接的信息
             Network[] networks = connMgr.getAllNetworks();
             //用于存放网络连接信息
             StringBuilder sb = new StringBuilder();
             if (0 == networks.length) {
-                Toast.makeText(context, "网络异常, 请检查网络设置", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "网络异常, 请检查网络设置", Toast.LENGTH_SHORT).show();
                 return false;
             }
             //通过循环将网络信息逐个取出来
@@ -222,6 +222,10 @@ public class loginer extends Activity {
             });
             thread.start();
         }
+    }
+
+    public static Sender getSender() {
+        return sender;
     }
 
     public Handler getmHandler() {

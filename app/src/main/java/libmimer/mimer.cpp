@@ -4,7 +4,6 @@
 #include "ndkUtils.h"
 
 static mm::MimCore::tTM*   client = NULL;
-static mm::MimCore::Stdio* ioer = NULL;
 static JavaVM* g_JavaVM = NULL;
 /*
  * Class:     com_mim_mimer_sender_Sender
@@ -15,7 +14,7 @@ JNIEXPORT jboolean JNICALL Relater(JNIEnv *env, jobject obj, jstring ip, jint po
     client = new mm::MimCore::tTM(g_JavaVM, env, obj);
     const char *ipc = Jstring2CStr(env, ip);
     client->Relate(ipc, port, CLIENT);
-    LOGD("Relater IP:%s PORT: %d ioer: %p\n", ipc, port, ioer);
+    LOGD("Relater IP:%s PORT: %d\n", ipc, port);
     return true;
 }
 
@@ -32,18 +31,13 @@ JNIEXPORT jboolean JNICALL Loginer(JNIEnv * env, jobject obj, jstring token, jst
 /*
  * Class:     com_mim_mimer_sender_Sender
  * Method:    Write
- * Signature: (ILjava/lang/String;)V
+ * Signature: (I[B)V
  */
-JNIEXPORT void JNICALL Writer(JNIEnv * env, jobject obj, jint nread, jstring buf)
+JNIEXPORT void JNICALL Writer(JNIEnv * env, jobject obj, jint size, jbyteArray buf)
 {
     LOGD("===Writer===\n");
-
-    if (ioer){
-        ioer->read(1024, -1);
-    }else{
-        ioer = client->getStdio();
-        LOGD("ioer is NULL\n");
-    }
+    char *cbuf = ConvertJByteaArrayToChars(env, buf);
+    client->writer(size, cbuf);
 }
 
 /*
@@ -72,7 +66,7 @@ JNIEXPORT void JNICALL finalizer(JNIEnv * env , jobject obj)
 static JNINativeMethod method_table[] = {
         { "Relate","(Ljava/lang/String;I)Z", (void*)Relater },
         { "Login","(Ljava/lang/String;Ljava/lang/String;I)Z", (void*)Loginer },
-        { "Write","(ILjava/lang/String;)V", (void*)Writer },
+        { "Write","(I[B)V", (void*)Writer },
         { "Read", "(ILjava/lang/String;)V", (void*)Reader },
         { "cfinalize", "()V", (void*)finalizer }
 };

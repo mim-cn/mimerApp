@@ -1,10 +1,10 @@
 package com.mim.mimer.chats;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,27 +12,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.mim.mimer.Constant;
 import com.mim.mimer.R;
-import com.mim.mimer.chats.Msg;
-import com.mim.mimer.chats.MsgAdapter;
+import com.mim.mimer.loginer.loginer;
 import com.mim.mimer.sender.Sender;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.codetail.animation.SupportAnimator;
-import io.codetail.animation.ViewAnimationUtils;
 import yalantis.com.sidemenu.interfaces.Resourceble;
 import yalantis.com.sidemenu.interfaces.ScreenShotable;
 import yalantis.com.sidemenu.model.SlideMenuItem;
@@ -60,6 +53,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     private static Sender sender = null;
     private MsgAdapter adapter;
     private List<Msg> msgList = new ArrayList<Msg>();
+    private Handler mHandler = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +62,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         msgListView = (ListView) findViewById(R.id.msg_list_view);
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
-        sender = getIntent().getParcelableExtra("SENDER");
+        sender = loginer.getSender();
         // 初始化消息数据
         initMsgs();
         adapter = new MsgAdapter(ChatActivity.this, R.layout.activity_msg, msgList);
@@ -78,8 +72,9 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
             public void onClick(View v) {
                 //sender.Write(0,null);
                 String content = inputText.getText().toString();
+                sender.writer(content.length(), content.getBytes());
                 if (!"".equals(content)) {
-                    Msg msg = new Msg(content, Msg.TYPE_SENT);
+                    Msg msg = new Msg(content, Msg.From.TYPE_SENT);
                     msgList.add(msg);
                     // 当有新消息时，刷新ListView中的显示
                     adapter.notifyDataSetChanged();
@@ -104,14 +99,38 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         setActionBar();
         createMenuList();
         viewAnimator = new ViewAnimator<>(this, list, null, drawerLayout, this);
+        AttachChater();
+        mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case Constant.RECEIVED_DATA_OK:
+                        // 当有新消息时，刷新ListView中的显示
+                        adapter.notifyDataSetChanged();
+                        // 将ListView定位到最后一行
+                        msgListView.setSelection(msgList.size());
+                        break;
+                    case Constant.SENDED_DATA_OK:
+//                        // 当有新消息时，刷新ListView中的显示
+//                        adapter.notifyDataSetChanged();
+//                        // 将ListView定位到最后一行
+//                        msgListView.setSelection(msgList.size());
+                        Toast.makeText(getApplicationContext(), "消息发送成功！", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     private void initMsgs() {
-        Msg msg1 = new Msg("Hello guy.", Msg.TYPE_RECEIVED);
+        Msg msg1 = new Msg("Hello guy.", Msg.From.TYPE_RECEIVED);
         msgList.add(msg1);
-        Msg msg2 = new Msg("Hello. Who is that?", Msg.TYPE_SENT);
+        Msg msg2 = new Msg("Hello. Who is that?", Msg.From.TYPE_SENT);
         msgList.add(msg2);
-        Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.TYPE_RECEIVED);
+        Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.From.TYPE_RECEIVED);
         msgList.add(msg3);
 
     }
@@ -238,5 +257,40 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public ListView getMsgListView() {
+        return msgListView;
+    }
+
+    public List<Msg> getMsgList() {
+        return msgList;
+    }
+
+    public EditText getInputText() {
+        return inputText;
+    }
+
+    public MsgAdapter getAdapter() {
+        return adapter;
+    }
+
+    public void AttachChater()
+    {
+        if (sender != null) {
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sender.AttachChater(ChatActivity.this);
+                }
+            });
+            thread.start();
+
+        }
+    }
+
+
+    public Handler getmHandler() {
+        return mHandler;
     }
 }

@@ -36,4 +36,12 @@ public class Constant {
      */
     public static final int INPUT_USERPWD_ERROR = 4;
 
+    /**
+     * read data from other peer
+     */
+    public static final int RECEIVED_DATA_OK = 100;
+    /**
+     * write data to other peer
+     */
+    public static final int SENDED_DATA_OK = 101;
 }

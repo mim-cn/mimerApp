@@ -82,6 +82,81 @@ namespace mm {
                     LOGD("NDKCallback uninit....\n");
                 }
             public:
+                jvalue CallMethodByName(const char*method, const char* sign, int size, char* data, int type)
+                {
+                    LOGD("CallMethodByName: %s method: %s", sign, method);
+                    // va_list args;
+                    jvalue result;
+                    if (_env->EnsureLocalCapacity(2) == JNI_OK)
+                    {
+                        jclass clazz = _env->GetObjectClass(_obj);
+                        if (NULL == clazz) {
+                            LOGE("Find %s error", "com/mim/mimer/sender/Sender");
+                            result.z = false;
+                            return result;
+                        }
+                        jmethodID mid = _env->GetMethodID(clazz, method, sign);
+                        if (NULL == mid) {
+                            LOGE("Get method: %s sign: %s", method, sign);
+                            result.z = false;
+                            return result;
+                        }
+                        _env->CallVoidMethod(_obj, mid, size,
+                            ConvertCharsToJByteaArray(_env, data, size), type);
+                        /*
+                        if (mid) {
+                            //_env->CallVoidMethod(_obj, mid, 6, ConvertCharsToJByteaArray(_env,"hello",6), 0);
+
+                            const char *p = sign;
+                            while ( *p != ')')p++;
+                            p++;
+                            LOGD(" Method: %s args: %s", *p, args);
+                            va_start(args, sign);
+                            _env->CallVoidMethod(_obj, mid, args);
+
+                            switch (*p)
+                            {
+                                case 'V':
+                                    _env->CallVoidMethod(_obj, mid, args);
+                                    break;
+                                case '[':
+                                case 'L':
+                                    result.l = _env->CallObjectMethodV(_obj, mid, args);
+                                    break;
+                                case 'Z':
+                                    result.z = _env->CallBooleanMethodV(_obj, mid, args);
+                                    break;
+                                case 'B':
+                                    result.b = _env->CallByteMethodV(_obj, mid, args);
+                                    break;
+                                case 'C':
+                                    result.b = _env->CallCharMethodV(_obj, mid, args);
+                                    break;
+                                case 'S':
+                                    result.s = _env->CallShortMethodV(_obj, mid, args);
+                                    break;
+                                case 'I':
+                                    result.i = _env->CallIntMethodV(_obj, mid, args);
+                                    break;
+                                case 'J':
+                                    result.j = _env->CallLongMethodV(_obj, mid, args);
+                                    break;
+                                case 'F':
+                                    result.f = _env->CallFloatMethodV(_obj, mid, args);
+                                    break;
+                                case 'D':
+                                    result.d = _env->CallDoubleMethodV(_obj, mid, args);
+                                    break;
+                                default:
+                                    _env->FatalError("illegal sign");
+                                    break;
+                            }
+                            va_end(args);
+                        }*/
+                        _env->DeleteLocalRef(clazz);
+                    }
+                    return result;
+                }
                 bool CallNativeMethod(const char* method, const char* sign)
                 {
                     LOGD("CallNativeMethod JNIEnv: %p method: %s sign: %s\n", _env, method, sign);
@@ -94,10 +169,10 @@ namespace mm {
                         }
                     }
                     if (NULL == _obj) {
-                        LOGE("Object jniHandleObject: %p methodID: %p",_obj ,methodID);
+                        LOGE("Object jniHandleObject: %p",_obj);
                         return false;
                     }else{
-                        LOGD("Object jniHandleObject: %p methodID: %p",_obj, methodID);
+                        LOGD("Object jniHandleObject: %p",_obj);
                     }
                     jclass jniHandle = _env->GetObjectClass(_obj);
                     if (NULL == jniHandle) {
@@ -107,6 +182,7 @@ namespace mm {
                     jmethodID methodID = _env->GetMethodID(jniHandle, method, sign);
                     if (NULL == methodID) {
                         LOGE("Get method: %s sign: %s", method, sign);
+
                         return false;
                     }
                     LOGD("Call method...");
@@ -122,48 +198,6 @@ namespace mm {
                     }*/
                     return true;
                 }
-                bool CallMethod(const char* classpath, const char* method, const char* sign)
-                {
-                    if(_JavaVM->AttachCurrentThread(&_env, NULL) != JNI_OK)
-                    {
-                        LOGD("%s: AttachCurrentThread() failed", __FUNCTION__);
-                        return false;
-                    }
-                    LOGD("CallMethod classpath: %s method: %s sign: %s\n", classpath, method, sign);
-                    if (NULL == _env){
-                        LOGE("JNIEnv %p is invalid", _env);
-                    }
-                    jclass jniHandle = _env->FindClass(classpath);
-                    if (NULL == jniHandle) {
-                        LOGE("Find %s error", classpath);
-                        return false;
-                    }
-                    jmethodID methodID = _env->GetMethodID(jniHandle, method, sign);
-                    if (NULL == methodID) {
-                        LOGE("Get method: %s sign: %s", method, sign);
-                        return false;
-                    }
-                    jobject jniHandleObject = _env->NewObject(jniHandle, methodID);
-                    if (NULL == jniHandleObject) {
-                        LOGE("Create a new Object failed jniHandleObject: %p methodID: %p",jniHandle ,methodID);
-                        return false;
-                    }else{
-                        LOGE("Create a new Object failed jniHandleObject: %p methodID: %p jniHandleObject: %p",jniHandle, methodID, jniHandleObject);
-                    }
-                    LOGD("Call method...");
-                    _env->CallObjectMethod(jniHandleObject, methodID);
-                    /*
-                    LOGD("free Local reference");
-                    _env->DeleteLocalRef(jniHandle);
-                    _env->DeleteLocalRef(jniHandleObject);
-                    */
-                    if(_JavaVM){
-                        LOGD("DetachCurrentThread...");
-                        _JavaVM->DetachCurrentThread();
-                        _env = NULL;
-                    }
-                    return true;
-                }
             private:
                 JavaVM*  _JavaVM = NULL;
                 JNIEnv*  _env = NULL;
@@ -172,22 +206,16 @@ namespace mm {
         class tTM :public ITM, public baseT
         {
             public:
-                tTM(JavaVM* vm = NULL, JNIEnv *env = NULL, jobject obj = NULL){
-                    _ndkCb = new NDKCallback(vm, env, obj);
-                }
-                ~tTM() {
-                    if(_ndkCb){
-                        delete(_ndkCb);
-                        _ndkCb = NULL;
-                    }
-                }
-            friend class clock;
-            friend class Stdio;
-            public:
-            Stdio* getStdio(){
-                LOGD("tTM getStdio %p\n", _stder);
-                return _stder;
+            tTM(JavaVM* vm = NULL, JNIEnv *env = NULL, jobject obj = NULL){
+                _ndkCb = new NDKCallback(vm, env, obj);
             }
+            ~tTM() {
+                if(_ndkCb){
+                    delete(_ndkCb);
+                    _ndkCb = NULL;
+                }
+            }
+            friend class clock;
         public:
             virtual int  Relate(const char* addr, const int port, Type type = Type::SERVER);
             virtual bool Create(const char* protocol = "MIM1");
@@ -196,6 +224,8 @@ namespace mm {
             virtual int  Sendto(void* buf, ssize_t& count);
             /* get */
             virtual int  Recfrm(void* buf, ssize_t& count);
+            /* java call c++ to write to stram */
+            void writer(ssize_t size, char *buf);
         private:
             /* will be implement a client */
             virtual void OnConnected(mmerrno status);
@@ -206,13 +236,11 @@ namespace mm {
             /* I/O ,if write a data*/
             virtual void OnWrote(mmerrno status);
         protected:
-            virtual void writer() {}
             virtual void reader() {}
             virtual void login()  {}
         private:
             Type userType;
             clock*  _pinger;
-            Stdio*  _stder;
             NDKCallback* _ndkCb;
         };
         typedef tTM TTM;
@@ -266,56 +294,6 @@ namespace mm {
                     else {
                         // _tmer->_loger->error("tTM %v OnTimer failed code: %v!!!", user(_tmer->userType), cbd->errcode);
                     }
-                }
-            }
-        private:
-            tTM * _tmer = NULL;
-        };
-
-        class Stdio : public File
-        {
-        public:
-            Stdio(tTM* tmer, Loop& loop) :File(loop),_tmer(tmer) {}
-            ~Stdio() {}
-        public:
-            Stdio & operator =(int fb)
-            {
-                this->setfb(fb);
-            }
-            virtual void OnWrite(int result)
-            {
-                LOGD("OnWrite result = %d\n", result);
-            }
-            virtual void OnOpen(int result)
-            {
-                LOGD("open end! result = %d\n", result);
-                char* buf = "1234";
-                this->write(buf, 4, -1);
-            }
-
-            virtual void OnClose(int result)
-            {
-                LOGD("OnClose!\n");
-                this->clean();
-            }
-
-            virtual void OnRead(char* data, int len)
-            {
-                LOGD("tTM %s Stdio OnRead %d!!!", user(_tmer->userType), len);
-                if (_tmer) {
-                    ssize_t size = len;
-                    void* postdata = (void*)data;
-                    _tmer->_monitor->setPtype(PUBLISH);
-                    callback* cbd = _tmer->_monitor->request(postdata, size);
-                    if (cbd->data) {
-                        _tmer->Sendto(cbd->data, size);
-                    }
-                    else {
-                        LOGD("tTM %s Stdio OnRead: %d!!!", user(_tmer->userType), cbd->errcode);
-                    }
-                }
-                else{
-
                 }
             }
         private:

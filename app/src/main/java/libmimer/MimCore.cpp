@@ -10,8 +10,7 @@ namespace mm {
             Loop loop(false);
             this->userType = type;
             this->init(loop);
-            this->_stder = new Stdio(this, loop);
-            LOGD("tTM is Relate addr: %s port: %d type: %s _stder: %p", addr, port, user(userType), _stder);
+            LOGD("tTM is Relate addr: %s port: %d type: %s", addr, port, user(userType));
             switch (type)
             {
             case SERVER:
@@ -85,7 +84,7 @@ namespace mm {
                 if (cbd->data) {
                     Sendto(cbd->data, cbd->size);
                     _ndkCb->CallNativeMethod("success", "()I");
-                    //_pinger = new clock(this, 1000, 10000);
+                    //_pinger = new clock(this, 1000, 3000);
                 }
                 else {
                     LOGE("User %s login in falied!!!", user(userType));
@@ -146,9 +145,11 @@ namespace mm {
                     void* reqdata = NULL;
                     callback* cbd = _monitor->request(reqdata, size);
                     if (cbd->data) {
+                        _ndkCb->CallMethodByName("onRead", "(I[BB)V", (int)cbd->size, (char*)cbd->data, 0);
                         Sendto(cbd->data, cbd->size);
                     }
                     else {
+                        _ndkCb->CallMethodByName("onRead", "(I[BB)V", 6, "hello", 0);
                         LOGE("tTM %s request failed code: %d!!!", user(userType), cbd->errcode);
                     }
                 }
@@ -174,30 +175,28 @@ namespace mm {
             }
         }
 
+        /* java call c++ to write to stram */
+        void tTM::writer(ssize_t size, char *buf) {
+            _monitor->setPtype(PUBLISH);
+            callback* cbd = _monitor->request(buf, size);
+            if(cbd->data){
+                Sendto(cbd->data, cbd->size);
+            }
+            else {
+                LOGE("tTM %s request failed code: %d!!!", user(userType), cbd->errcode);
+            }
+        }
+
         //client or client need implement, when it needs to send data, it id called
         void tTM::OnWrote(mmerrno status) {
-            LOGD("tTM is OnWrote...");
+            LOGD("tTM is OnWrote... %d", status);
             if (this->userType & 1) { //Type::CLIENT ||  Type::BOTH_CLI
-                LOGD("tTM is OnWrote client");
-                this->writer();
-                //_stder->read(1024, -1);
-                /*
-                char sendbuf[1024];
-                memset(sendbuf, 0, 1024);
-                scanf("%s", sendbuf);
-                ssize_t size = strlen(sendbuf) + 1;
-                void* postdata = (void*)sendbuf;
-                _monitor->setPtype(PUBLISH);
-                callback* cbd = _monitor->request(postdata, size);
-                if(cbd->data){
-                    Sendto(cbd->data, cbd->size);
-                }
-                else {
-                    LOGE("tTM %v request failed code: %v!!!", user(userType), cbd->errcode);
-                }*/
+                LOGD("tTM is OnWrote client...");
+                _ndkCb->CallNativeMethod("onWrite", "()V");
             }
             else { //Type::SERVER ||  Type::BOTH_SER
                 LOGD("tTM is OnWrote server");
+                _ndkCb->CallNativeMethod("onWrite", "()V");
             }
         }
 

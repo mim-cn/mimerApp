@@ -31,16 +31,21 @@ public class MsgAdapter extends ArrayAdapter<Msg> {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        if (msg.getType() == Msg.TYPE_RECEIVED) {
+        if (msg.getFrom() == Msg.From.TYPE_RECEIVED) {
             // 如果是收到的消息，则显示左边的消息布局，将右边的消息布局隐藏
             viewHolder.leftLayout.setVisibility(View.VISIBLE);
             viewHolder.rightLayout.setVisibility(View.GONE);
-            viewHolder.leftMsg.setText(msg.getContent());
-        } else if (msg.getType() == Msg.TYPE_SENT) {
+            if(msg.getType() == Msg.MsgType.PURE_TEXT){
+                viewHolder.leftMsg.setText(msg.getString());
+            }else{
+
+            }
+
+        } else if (msg.getFrom() == Msg.From.TYPE_SENT) {
             // 如果是发出的消息，则显示右边的消息布局，将左边的消息布局隐藏
             viewHolder.rightLayout.setVisibility(View.VISIBLE);
             viewHolder.leftLayout.setVisibility(View.GONE);
-            viewHolder.rightMsg.setText(msg.getContent());
+            viewHolder.rightMsg.setText(msg.getString());
         }
         return view;
     }

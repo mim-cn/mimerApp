@@ -1,14 +1,18 @@
 package com.mim.mimer.sender;
 
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.mim.mimer.loginer.loginCB;
+import com.mim.mimer.chats.ChatActivity;
+import com.mim.mimer.chats.Msg;
 import com.mim.mimer.loginer.loginer;
 import com.mim.mimer.Constant;
 
-public final class Sender implements Parcelable, loginCB {
+import java.io.Serializable;
+
+public final class Sender implements Serializable, SenderCb {
     static {
         try {
             System.loadLibrary("mimer");
@@ -25,20 +29,35 @@ public final class Sender implements Parcelable, loginCB {
     private String token;
     private String passwd;
     private int passwdLen;
-    private loginer lger;
+    private loginer lger = null;
+    private ChatActivity chater = null;
 
     public Sender(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
 
-    public boolean AttachLoginer(loginer lger){
-        if(null == lger) {
+    public boolean AttachLoginer(loginer lger) {
+        if (null == lger) {
             return false;
-        }else{
+        } else {
             this.lger = lger;
         }
         return true;
+    }
+
+    public boolean AttachChater(ChatActivity chater) {
+        if (null == chater) {
+            return false;
+        } else {
+            this.chater = chater;
+        }
+        return true;
+    }
+
+    public void writer(int size, byte[] buf)
+    {
+        Write(size, buf);
     }
 
     public synchronized void finalize() {
@@ -58,7 +77,7 @@ public final class Sender implements Parcelable, loginCB {
     /*
     标准写回调函数
     * */
-    public native void Write(int nread, String buf);
+    public native void Write(int nread, byte[] buf);
 
     /*
     标准读回调函数
@@ -66,38 +85,6 @@ public final class Sender implements Parcelable, loginCB {
     public native void Read(int nread, String buf);
 
     private native void cfinalize();
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        // 序列化过程：必须按成员变量声明的顺序进行封装
-        dest.writeString(ip);
-        dest.writeInt(port);
-        dest.writeString(token);
-        dest.writeString(passwd);
-        dest.writeInt(passwdLen);
-    }
-
-    public static final Parcelable.Creator<Sender> CREATOR = new Creator<Sender>() {
-
-        @Override
-        public Sender createFromParcel(Parcel source) {
-            String ip = source.readString();
-            int port = source.readInt();
-            Sender sender = new Sender(ip, port);
-            return sender;
-        }
-
-        @Override
-        public Sender[] newArray(int size) {
-            return new Sender[size];
-        }
-    };
-
 
     @Override
     public int success() {
@@ -110,5 +97,27 @@ public final class Sender implements Parcelable, loginCB {
     public void error() {
         System.out.println("connect error！");
         lger.getmHandler().sendEmptyMessage(Constant.CONN_SERVER_ERROR);
+    }
+
+    @Override
+    public void onRead(int size, byte[] buf, byte type) {
+        if (null != this.chater) {
+            String content = new String(buf);
+            float a = (float) Math.random();
+            Msg msg1 = new Msg(content + a , Msg.From.TYPE_RECEIVED, Msg.MsgType.values()[type]);
+            chater.getMsgList().add(msg1);
+            chater.getmHandler().sendEmptyMessage(Constant.RECEIVED_DATA_OK);
+        } else {
+            System.out.println("onRead error, chater is null！");
+        }
+    }
+
+    @Override
+    public void onWrite() {
+        if (null != this.chater) {
+            chater.getmHandler().sendEmptyMessage(Constant.SENDED_DATA_OK);
+        } else {
+            System.out.println("onWrite error, chater is null！");
+        }
     }
 }

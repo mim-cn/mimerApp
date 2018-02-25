@@ -30,3 +30,25 @@ jstring CStr2Jstring(JNIEnv *env, const char *pat)
     // LOGD("CStr2Jstring char* %s\n", pat);
     return (jstring) env->NewObject(strClass, mID, bytes, encoding);
 }
+
+char* ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray bytearray)
+{
+    char *chars = NULL;
+    jbyte *bytes;
+    bytes = env->GetByteArrayElements(bytearray, 0);
+    int chars_len = env->GetArrayLength(bytearray);
+    chars = new char[chars_len + 1];
+    memset(chars,0,chars_len + 1);
+    memcpy(chars, bytes, chars_len);
+    chars[chars_len] = 0;
+    env->ReleaseByteArrayElements(bytearray, bytes, 0);
+    return chars;
+}
+
+jbyteArray ConvertCharsToJByteaArray(JNIEnv *env, char *ret, size_t len)
+{
+    // LOGD("ConvertCharsToJByteaArray char* %s len:%d\n", ret, len);
+    jbyteArray result = env->NewByteArray( len);
+    env->SetByteArrayRegion(result, 0, len, (const jbyte*)ret);
+    return result;
+}
