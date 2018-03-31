@@ -65,8 +65,8 @@ public class PageManager extends AppCompatActivity implements RadioGroup.OnCheck
         rg_tab_bar.setOnCheckedChangeListener(this);
 
         vpager = (ViewPager) findViewById(R.id.vpager);
-        Chat_List_Layout = findViewById(R.id.chat_list_page);
-        Contact_List_Layout = findViewById(R.id.contact_list_page);
+        Chat_List_Layout = (LinearLayout) findViewById(R.id.chat_list_page);
+        Contact_List_Layout = (LinearLayout) findViewById(R.id.contact_list_page);
         vpager.setAdapter(mAdapter);
         vpager.setCurrentItem(PAGE_ONE);
         vpager.addOnPageChangeListener(this);
