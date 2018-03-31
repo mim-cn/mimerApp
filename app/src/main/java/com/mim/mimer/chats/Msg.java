@@ -41,6 +41,7 @@ public class Msg {
     public String  getString()  { return new String(content); }
     public MsgType getType()    { return type; }
     public From    getFrom()    { return from; }
+    public byte[]  getData()    { return content;}
     public JSONObject getJson() throws JSONException {
         try {
             if (MsgType.JSON_TEXT == type) {

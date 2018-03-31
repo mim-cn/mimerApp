@@ -1,14 +1,17 @@
 package com.mim.mimer.chats;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +21,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.mim.database.sqliter;
 import com.mim.mimer.Constant;
 import com.mim.mimer.R;
-import com.mim.mimer.loginer.loginer;
+import com.mim.mimer.loginer.loginActivity;
 import com.mim.mimer.sender.Sender;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +40,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     ListView msgListView;
     EditText inputText;
     Button send;
-
+    private int id = 0;
     public static final String CLOSE = "Close";
     public static final String BUILDING = "Building";
     public static final String BOOK = "Book";
@@ -54,15 +59,21 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     private MsgAdapter adapter;
     private List<Msg> msgList = new ArrayList<Msg>();
     private Handler mHandler = null;
+    private sqliter sqler = null;
+    private String chatTo = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        //新页面接收数据
+        Bundle bundle = this.getIntent().getExtras();
+        chatTo = bundle.getString("ChatUser");
+        setTitle(chatTo);
         msgListView = (ListView) findViewById(R.id.msg_list_view);
         inputText = (EditText) findViewById(R.id.input_text);
         send = (Button) findViewById(R.id.send);
-        sender = loginer.getSender();
+        sender = loginActivity.getSender();
         // 初始化消息数据
         initMsgs();
         adapter = new MsgAdapter(ChatActivity.this, R.layout.activity_msg, msgList);
@@ -72,9 +83,15 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
             public void onClick(View v) {
                 //sender.Write(0,null);
                 String content = inputText.getText().toString();
-                sender.writer(content.length(), content.getBytes());
-                if (!"".equals(content)) {
-                    Msg msg = new Msg(content, Msg.From.TYPE_SENT);
+                if (null != sender && sender.isConnected()) {
+                    sender.writer(content.length(), content.getBytes());
+                }
+                if (0 != content.length()) {
+                    Msg msg = new Msg(content, Msg.From.TYPE_SENT, Msg.MsgType.PURE_TEXT);
+                    if(null != sqler) {
+                        String insert_sql = "INSERT INTO chat VALUES (" + (id++) + ", 'you', '" + chatTo + "', '" + msg.getString() + "')";
+                        sqler.execute(insert_sql);
+                    }
                     msgList.add(msg);
                     // 当有新消息时，刷新ListView中的显示
                     adapter.notifyDataSetChanged();
@@ -126,12 +143,39 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     }
 
     private void initMsgs() {
-        Msg msg1 = new Msg("Hello guy.", Msg.From.TYPE_RECEIVED);
-        msgList.add(msg1);
-        Msg msg2 = new Msg("Hello. Who is that?", Msg.From.TYPE_SENT);
-        msgList.add(msg2);
-        Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.From.TYPE_RECEIVED);
-        msgList.add(msg3);
+        String path = this.getDatabasePath("ignored").getParentFile().getAbsolutePath() + "/example.db";
+        String path1 = this.getFilesDir().getPath() + "/example.db";
+        sqler = new sqliter(path1, Constant.SQLITE_OPEN_READWRITE | Constant.SQLITE_OPEN_CREATE);
+        boolean con = sqler.connect();
+        if(true == con) {
+            String version = sqler.getVersion();
+            boolean create_bool = false;
+            if (false == sqler.isExist("chat")) {
+                create_bool = sqler.execute("CREATE TABLE chat ('id' INTEGER PRIMARY KEY, 'from_id' CHAR(16), 'to_id' CHAR(16), 'message' TEXT)");
+            } else {
+                sqler.executeQuery("SELECT * from chat");
+                while (sqler.Next()) {
+                    int id1 = sqler.getInt(0);
+                    String from = new String(sqler.getString(1));
+                    String to = new String(sqler.getString(2));
+                    String msg = new String(sqler.getString(3));
+                    id = id1;
+//                    if (tto.equals(chatTo)) {
+                        Msg msg1 = new Msg(msg, Msg.From.TYPE_SENT, Msg.MsgType.PURE_TEXT);
+                        msgList.add(msg1);
+//                    }
+                }
+            }
+//        Msg msg1 = new Msg("Hello guy.", Msg.From.TYPE_RECEIVED);
+//        msgList.add(msg1);
+//        Msg msg2 = new Msg("Hello. Who is that?", Msg.From.TYPE_SENT);
+//        msgList.add(msg2);
+//        Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.From.TYPE_RECEIVED);
+//        msgList.add(msg3);
+        }else{
+            Log.e("Chating", "connect databases is error");
+            sqler = null;
+        }
 
     }
 
@@ -229,6 +273,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
+    /*
     @Override
     public synchronized void onBackPressed() {
         if (!isExit) {
@@ -239,6 +284,7 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
             this.finish();
         }
     }
+    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignParentBottom="true"
+    android:background="@color/contact_bg_color"
+    android:orientation="horizontal"
+    android:paddingBottom="2dp">
+
+    <LinearLayout
+        android:id="@+id/contact_list_page"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/contact_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:paddingTop="5dp"></android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/contactTextView"
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:text="朋友" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -8,5 +8,5 @@
 char *Jstring2CStr(JNIEnv *env, jstring jstr);
 jstring CStr2Jstring(JNIEnv *env, const char *pat);
 char* ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray bytearray);
-jbyteArray ConvertCharsToJByteaArray(JNIEnv *env, char *ret, size_t len);
+jbyteArray ConvertCharsToJByteaArray(JNIEnv *env, const char *ret, size_t len);
 #endif

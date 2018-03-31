@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.mim.mimer.chats.ChatActivity;
 import com.mim.mimer.chats.Msg;
-import com.mim.mimer.loginer.loginer;
+import com.mim.mimer.loginer.loginActivity;
 import com.mim.mimer.Constant;
 
 import java.io.Serializable;
@@ -29,15 +29,16 @@ public final class Sender implements Serializable, SenderCb {
     private String token;
     private String passwd;
     private int passwdLen;
-    private loginer lger = null;
+    private loginActivity lger = null;
     private ChatActivity chater = null;
+    private boolean isConnected = false;
 
     public Sender(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
 
-    public boolean AttachLoginer(loginer lger) {
+    public boolean AttachLoginer(loginActivity lger) {
         if (null == lger) {
             return false;
         } else {
@@ -59,6 +60,8 @@ public final class Sender implements Serializable, SenderCb {
     {
         Write(size, buf);
     }
+
+    public boolean isConnected(){return isConnected; }
 
     public synchronized void finalize() {
         cfinalize();
@@ -88,6 +91,7 @@ public final class Sender implements Serializable, SenderCb {
 
     @Override
     public int success() {
+        isConnected = true;
         System.out.println("connect success！");
         lger.getmHandler().sendEmptyMessage(Constant.CONN_SERVER_OK);
         return 0;

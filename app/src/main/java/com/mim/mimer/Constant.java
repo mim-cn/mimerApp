@@ -5,6 +5,13 @@ package com.mim.mimer;
  */
 
 public class Constant {
+    //////////////////////////Database Mode ////////////////////////////////
+
+    public static final int SQLITE_OPEN_READONLY = 1;
+    public static final int SQLITE_OPEN_READWRITE = 2;
+    public static final int SQLITE_OPEN_CREATE = 4;
+    public static final int SQLITE_OPEN_URI = 64;
+    public static final int SQLITE_OPEN_MEMORY = 128;
     //////////////////////////server information//////////////////////////////
     /**
      * server daemon

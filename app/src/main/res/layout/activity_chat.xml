@@ -6,7 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#d8e0e8"
+        android:background="@color/contact_bg_color"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
@@ -19,7 +19,7 @@
         <ListView
             android:id="@+id/msg_list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="472dp"
             android:layout_weight="1"
             android:divider="#0000"></ListView>
 
@@ -30,24 +30,26 @@
             <EditText
                 android:id="@+id/input_text"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
+                android:background="?attr/colorPrimary"
                 android:maxLines="2" />
 
             <Button
                 android:id="@+id/send"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="2"
                 android:layout_height="wrap_content"
-                android:text="SEND"/>
+                android:text="SEND" />
         </LinearLayout>
     </LinearLayout>
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="@dimen/sliding_menu_width"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_height="match_parent"
         android:layout_gravity="start|bottom"
+        android:layout_marginTop="?attr/actionBarSize"
         android:scrollbarThumbVertical="@android:color/transparent">
 
         <LinearLayout
@@ -56,7 +58,6 @@
             android:layout_height="@dimen/sliding_menu_width"
             android:background="@android:color/transparent"
             android:divider="@android:color/transparent"
-            android:orientation="vertical">
-        </LinearLayout>
+            android:orientation="vertical"></LinearLayout>
     </ScrollView>
 </android.support.v4.widget.DrawerLayout>

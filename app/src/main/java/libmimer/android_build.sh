@@ -13,7 +13,8 @@ if [[ $# < 1 ]]; then
 	echo "1.  mimp"
 	echo "2.  uv"
 	echo "3.  uvbase"
-	echo "0.  all"
+	echo "4.  sqliter"
+	echo "5.  mimcore"
 	exit
 fi
 

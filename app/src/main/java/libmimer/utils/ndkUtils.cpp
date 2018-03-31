@@ -19,7 +19,16 @@ char *Jstring2CStr(JNIEnv *env, jstring jstr)
     return rtn;
 }
 
-
+jstring CStr2Jstring(JNIEnv* env, const char* pat)
+{
+    jclass strClass = env->FindClass("Ljava/lang/String;");
+    jmethodID ctorID = env->GetMethodID(strClass, "<init>", "([BLjava/lang/String;)V");
+    jbyteArray bytes = env->NewByteArray(strlen(pat));
+    env->SetByteArrayRegion(bytes, 0, strlen(pat), (jbyte*)pat);
+    jstring encoding = env->NewStringUTF("utf-8");
+    return (jstring)env->NewObject(strClass, ctorID, bytes, encoding);
+}
+/*
 jstring CStr2Jstring(JNIEnv *env, const char *pat)
 {
     jclass strClass = env->FindClass("Ljava/lang/String;");
@@ -30,7 +39,7 @@ jstring CStr2Jstring(JNIEnv *env, const char *pat)
     // LOGD("CStr2Jstring char* %s\n", pat);
     return (jstring) env->NewObject(strClass, mID, bytes, encoding);
 }
-
+*/
 char* ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray bytearray)
 {
     char *chars = NULL;
@@ -45,7 +54,7 @@ char* ConvertJByteaArrayToChars(JNIEnv *env, jbyteArray bytearray)
     return chars;
 }
 
-jbyteArray ConvertCharsToJByteaArray(JNIEnv *env, char *ret, size_t len)
+jbyteArray ConvertCharsToJByteaArray(JNIEnv *env, const char *ret, size_t len)
 {
     // LOGD("ConvertCharsToJByteaArray char* %s len:%d\n", ret, len);
     jbyteArray result = env->NewByteArray( len);
