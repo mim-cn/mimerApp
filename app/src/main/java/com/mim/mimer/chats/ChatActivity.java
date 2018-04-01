@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import com.mim.database.sqliter;
 import com.mim.mimer.Constant;
 import com.mim.mimer.R;
+import com.mim.mimer.Utils;
 import com.mim.mimer.loginer.loginActivity;
 import com.mim.mimer.sender.Sender;
 
@@ -89,7 +91,9 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
                 if (0 != content.length()) {
                     Msg msg = new Msg(content, Msg.From.TYPE_SENT, Msg.MsgType.PURE_TEXT);
                     if(null != sqler) {
-                        String insert_sql = "INSERT INTO chat VALUES (" + (id++) + ", 'you', '" + chatTo + "', '" + msg.getString() + "')";
+                        String insert_sql = "INSERT INTO chat VALUES (" + (id++) + ", 'you', '" +
+                                Utils.encode2Base64(chatTo) + "', '" +
+                                msg.getBase64Content() + "')";
                         sqler.execute(insert_sql);
                     }
                     msgList.add(msg);
@@ -143,35 +147,31 @@ public class ChatActivity extends AppCompatActivity implements ViewAnimator.View
     }
 
     private void initMsgs() {
-        String path = this.getDatabasePath("ignored").getParentFile().getAbsolutePath() + "/example.db";
-        String path1 = this.getFilesDir().getPath() + "/example.db";
-        sqler = new sqliter(path1, Constant.SQLITE_OPEN_READWRITE | Constant.SQLITE_OPEN_CREATE);
-        boolean con = sqler.connect();
-        if(true == con) {
+        if (null == sqler){
+            String path = this.getDatabasePath("ignored").getParentFile().getAbsolutePath() + "/example.db";
+            String path1 = this.getFilesDir().getPath() + "/example.db";
+            sqler = new sqliter(path1, Constant.SQLITE_OPEN_READWRITE | Constant.SQLITE_OPEN_CREATE);
+            sqler.connect();
+        }
+        if(sqler.isConnected()) {
             String version = sqler.getVersion();
             boolean create_bool = false;
             if (false == sqler.isExist("chat")) {
-                create_bool = sqler.execute("CREATE TABLE chat ('id' INTEGER PRIMARY KEY, 'from_id' CHAR(16), 'to_id' CHAR(16), 'message' TEXT)");
+                create_bool = sqler.execute("CREATE TABLE IF NOT EXISTS chat ('id' INTEGER PRIMARY KEY, 'from_id' CHAR(16), 'to_id' CHAR(16), 'message' TEXT)");
             } else {
-                sqler.executeQuery("SELECT * from chat");
+                sqler.executeQuery("SELECT * from chat where to_id = " + Utils.escapeSql(Utils.encode2Base64(chatTo)));
                 while (sqler.Next()) {
                     int id1 = sqler.getInt(0);
                     String from = new String(sqler.getString(1));
-                    String to = new String(sqler.getString(2));
-                    String msg = new String(sqler.getString(3));
+                    String to = Utils.decode2Str(sqler.getString(2));
+                    byte[] msg = Utils.decode2Bytes(sqler.getString(3));
                     id = id1;
-//                    if (tto.equals(chatTo)) {
+                    if (true == to.equals(chatTo)) {
                         Msg msg1 = new Msg(msg, Msg.From.TYPE_SENT, Msg.MsgType.PURE_TEXT);
                         msgList.add(msg1);
-//                    }
+                    }
                 }
             }
-//        Msg msg1 = new Msg("Hello guy.", Msg.From.TYPE_RECEIVED);
-//        msgList.add(msg1);
-//        Msg msg2 = new Msg("Hello. Who is that?", Msg.From.TYPE_SENT);
-//        msgList.add(msg2);
-//        Msg msg3 = new Msg("This is Tom. Nice talking to you. ", Msg.From.TYPE_RECEIVED);
-//        msgList.add(msg3);
         }else{
             Log.e("Chating", "connect databases is error");
             sqler = null;

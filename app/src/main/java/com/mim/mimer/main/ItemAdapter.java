@@ -17,7 +17,7 @@ import com.mim.mimer.R;
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> implements View.OnClickListener {
 
     private List<ItemView> mList;
-    private Fragment mContext;
+    private Context mContext;
     private OnItemClickListener mOnItemClickListener = null;
 
     //用一个集合将适配中创建的所有 holder对象存储到这个容器中，因为本类中有对holder中的控件创建了监听事件
@@ -39,7 +39,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> 
     }
 
 
-    public ItemAdapter(List<ItemView> list, Fragment context) {
+    public ItemAdapter(List<ItemView> list, Context context) {
         this.mContext = context;
         this.mList = list;
         this.mListHolder = new ArrayList<MyViewHolder>();
@@ -64,7 +64,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.MyViewHolder> 
 
     @Override
     public ItemAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext.getContext()).inflate(R.layout.item_chlid, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.item_chlid, parent, false);
         //为每个item设置点击事件；
         view.setOnClickListener(this);
         return new MyViewHolder(view);

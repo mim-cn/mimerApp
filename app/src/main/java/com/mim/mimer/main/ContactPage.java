@@ -39,7 +39,7 @@ public class ContactPage extends Fragment {
             initData();
             mListView = (RecyclerView) mView.findViewById(R.id.contact_recycler_view);
             mListView.setLayoutManager(new LinearLayoutManager(mView.getContext()));
-            adapter = new ItemAdapter(list, this);
+            adapter = new ItemAdapter(list, mView.getContext());
             mListView.setAdapter(adapter);
         }
         ((TextView) mView.findViewById(R.id.contactTextView)).setText("聊天界面");

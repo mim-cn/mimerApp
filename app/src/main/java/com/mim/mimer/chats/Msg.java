@@ -1,5 +1,9 @@
 package com.mim.mimer.chats;
 
+import android.util.Base64;
+
+import com.mim.mimer.Utils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +41,7 @@ public class Msg {
     public byte[]  getContent() {
         return content;
     }
+    public String  getBase64Content() { return Utils.encode2Base64(content); }
     public int     getSize()    { return content.length; }
     public String  getString()  { return new String(content); }
     public MsgType getType()    { return type; }

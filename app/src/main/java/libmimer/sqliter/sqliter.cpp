@@ -79,7 +79,7 @@ JNIEXPORT jboolean JNICALL executeSql(JNIEnv * env, jobject obj, jstring ssql)
     try{
         if(db){
             char* sql = Jstring2CStr(env, ssql);
-            LOGD("execute query: %s", sql);
+            LOGD("executeSql query: %s", sql);
             //db->exec(sql);
             if(query){
                 LOGD("delete old execute query: %s", sql);
@@ -111,7 +111,7 @@ JNIEXPORT jboolean JNICALL exec(JNIEnv * env, jobject obj, jstring ssql)
         if(db){
             char* sql = Jstring2CStr(env, ssql);
             int rn = db->exec(sql);
-            LOGD("execute query: %s %d", sql, rn);
+            LOGD("exec query: %s %d", sql, rn);
             return true;
         }else{
             LOGE("execute query failed, database is NULL");
@@ -246,6 +246,7 @@ JNIEXPORT jbyteArray JNICALL getColumnStringByIndex(JNIEnv *env, jobject obj, ji
 {
     if(db && query){
         const char* ret = query->getColumn(index).getString().c_str();
+        LOGE("getColumnStringByIndex: %s", ret);
         size_t len  = strlen(ret);
         return ConvertCharsToJByteaArray(env, ret, len);
     }else{
